@@ -1,0 +1,67 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    "users": {
+        "$uid": {
+            ".read": true,
+            ".write": "$uid === auth.uid"
+        }
+    },
+    "posts": {
+        ".indexOn": ["authorId", "timestamp"],
+        "$postId": {
+            ".read": true,
+            ".write": "auth != null && (!data.exists() || data.child('authorId').val() === auth.uid)",
+            "likes": {
+               ".write": "auth != null" 
+            },
+            "comments": {
+               ".write": "auth != null"
+            }
+        }
+    },
+    "notifications": {
+        "$uid": {
+            ".read": "$uid === auth.uid",
+            ".write": "auth != null" 
+        }
+    },
+    "chats": {
+        "$chatId": {
+            ".read": "auth != null && ($chatId.beginsWith(auth.uid + '_') || $chatId.endsWith('_' + auth.uid))",
+            ".write": "auth != null && ($chatId.beginsWith(auth.uid + '_') || $chatId.endsWith('_' + auth.uid))"
+        }
+    },
+    "stories": {
+        ".read": true,
+        "$storyId": {
+            ".write": "auth != null && ((!data.exists() && newData.child('userId').val() === auth.uid) || (data.exists() && data.child('userId').val() === auth.uid))"
+        }
+    },
+    "followers": {
+         "$uid": {
+             ".read": true,
+             ".write": "auth != null"
+         }
+    },
+    "following": {
+         "$uid": {
+             ".read": true,
+             ".write": "$uid === auth.uid"
+         }
+    },
+    "presence": {
+        "$uid": {
+            ".read": true,
+            ".write": "$uid === auth.uid"
+        }
+    },
+    "analytics": {
+         "$uid": {
+             ".read": "$uid === auth.uid",
+             ".write": "auth != null"
+         }
+    }
+  }
+}
